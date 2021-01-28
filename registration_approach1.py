@@ -87,7 +87,7 @@ def registration_a1(u,v,t,I,c1,c2,folder_results,ks):
                 tT_res4[:,k] = tT
 
             if i == I:
-                tT_return[:, ks] = tT
+                tT_return[:, k] = tT
 
     # Save mapping for future use (only for I<5)
     if I == 1:
