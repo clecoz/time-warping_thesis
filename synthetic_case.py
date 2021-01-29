@@ -159,7 +159,7 @@ print('\n Elapsed time for ks {}: {}'.format(ks,end - start))
 print("\nPost-processing and warping")
 
 # Warped field at the station locations
-u_warped_station = mapped(u_station, t, Tt, I)
+u_warped_station = mapped(u, t_resample, Tt, I)
 
 # Interpolate the mappings onto the grid
 x_proj, y_proj = pyproj.transform(proj_latlon, proj_utm, lon_v, lat_v)
@@ -216,11 +216,30 @@ if stats:
 
 
     # ---------------------------------------------
+    # Timing error
+    # Find indexes of the pixel with the max. rain
+    tv = np.argmax(v_dom_resample, axis=0)
+    tu = np.argmax(u_dom_resample, axis=0)
+    tuw = np.argmax(u_warped, axis=0)
+
+    # Compute avrage timing difference
+    mask = (~(v_dom_resample < threshold).all(axis=0) * ~(u_dom_resample < 1).all(axis=0))
+    timing_before = np.mean(np.abs(tu[mask] - tv[mask])) / 10
+    timing_after = np.mean(np.abs(tuw[mask] - tv[mask])) / 10
+
+    # Print results
+    print("\nAverage timing error for threshold={}mm/h (sample number = {})".format(threshold, np.sum(mask)))
+    print("Before: {:.2f} h".format(timing_before))
+    print("After:  {:.2f} h".format(timing_after))
+
+
+    # ---------------------------------------------
     # Position error
     # Find indexes of the pixel with the max. rain
     iu, ju = np.unravel_index(np.argmax(u_dom_resample.reshape(ntr, -1), axis=1), (37, 37))
     iv, jv = np.unravel_index(np.argmax(v_dom_resample.reshape(ntr, -1), axis=1), (37, 37))
     iuw, juw = np.unravel_index(np.argmax(u_warped.reshape(ntr, -1), axis=1), (37, 37))
+
 
     # Compute distance between max.
     def distance(origin, destination):
@@ -233,6 +252,7 @@ if stats:
             * math.cos(math.radians(lat2)) * math.sin(dlon / 2) * math.sin(dlon / 2)
         c = 2 * math.asin(np.sqrt(a))
         return radius * c
+
 
     dist_before = np.zeros(ntr)
     dist_after = np.zeros(ntr)
@@ -249,23 +269,6 @@ if stats:
     print("\nAverage position error for threshold={}mm/h (sample number = {})".format(threshold, np.sum(mask)))
     print("Before: {:.2f} km".format(average_dist_before))
     print("After:  {:.2f} km".format(average_dist_after))
-
-    # ---------------------------------------------
-    # Timing error
-    # Find indexes of the pixel with the max. rain
-    tv = np.argmax(v_dom_resample, axis=0)
-    tu = np.argmax(u_dom_resample, axis=0)
-    tuw = np.argmax(u_warped, axis=0)
-
-    # Compute avrage timing difference
-    mask = (~(v_dom_resample < threshold).all(axis=0) * ~(u_dom_resample < 1).all(axis=0))
-    timing_before = np.mean(np.abs(tu[mask] - tv[mask])) / 10
-    timing_after = np.mean(np.abs(tuw[mask] - tv[mask])) / 10
-
-    # Print results
-    print("\nAverage timing error for threshold={}mm/h (sample number = {})".format(threshold, np.sum(mask)))
-    print("Before: {:.2f} h".format(timing_before))
-    print("After:  {:.2f} h".format(timing_after))
 
 
 
@@ -371,7 +374,6 @@ if plot:
 
     cb_ax = fig.add_axes([0.05, 0.1, 0.9, 0.03])
     cbar = fig.colorbar(av, cax=cb_ax, orientation="horizontal")
-    #cbar = fig.colorbar(av, orientation="horizontal")
     fig.tight_layout(rect=(0, 0.1, 1, 1))
     cbar.set_label('h')
     plt.savefig(folder_result + '/mapping.png', dpi=200)
