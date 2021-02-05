@@ -1,24 +1,19 @@
-import netCDF4 as nc
-import numpy as np
-#import scipy.signal as sc
 import scipy.optimize as op
-from scipy import interpolate
-import os
-import pandas as pd
-import logging
-import matplotlib.pyplot as plt
-import pylab
-import glob
-from mpl_toolkits.basemap import Basemap, cm
-import matplotlib.dates as dt
-import matplotlib.animation as animation
-
 from morphing_function import *
 
-import time
 #===========================================================================
 
-def registration_a3(u,v,t,I,c1,c2,c3,Acomb,space_corr,folder_results,ks):
+def registration_a3(u,v,t,I,c1,c2,cs,Acomb,space_corr,folder_results,ks):
+    # This function perform the automatic registration for the time warping and return the mappings.
+    # It takes as input:
+    # - u, the rainfall time series to be corrected.
+    # - v, the target rainfall time series (assumed to be the truth). The inputs u and v need to have the same dimensions.
+    # - t, the time coordinates.
+    # - the number of steps I (corresponding to the number of morphing grid). I has to be an integer.
+    # - the regulation coefficients c1, c2 and cs (floats).
+    # - Acomb is a matrix pariring two by two the stations and space_corr the corresponding correlation. Together, they define the influence function.
+    # - folder_results is a folder, the mappings will be saved in this folder for future use.
+    # - ks is added to the file names containing the mappings (used for the LOOV experiment).
 
     nt = len(t)
     ns = u.shape[1]
@@ -26,7 +21,6 @@ def registration_a3(u,v,t,I,c1,c2,c3,Acomb,space_corr,folder_results,ks):
     # Iteration on the morphing grids (i<=I)
     for i in range(1, I + 1):
         print('\n Step' + str(i))
-        start_time = time.time()
         mi = 2 ** i + 1
 
         # Initialization
@@ -48,7 +42,7 @@ def registration_a3(u,v,t,I,c1,c2,c3,Acomb,space_corr,folder_results,ks):
         vs = smooth(v, t, i)
         us = smooth(u, t, i)
 
-        # Normalize ?
+        # Normalize
         for k in range(ns):
             if np.max(us[:,k]) > 0:
                 us[:,k] = np.max(vs[:,k]) * us[:,k] / np.max(us[:,k])
@@ -60,7 +54,7 @@ def registration_a3(u,v,t,I,c1,c2,c3,Acomb,space_corr,folder_results,ks):
         cons3 = {'type': 'ineq', 'fun': constr3_bis, 'args': (t, i,ns)}
 
         # Optimize
-        tTo = op.minimize(J_der, tT, args=(us, vs, t, i, c1, c2, c3,Acomb,space_corr), jac=True, constraints=[cons3, cons2, cons], method='SLSQP', options={'maxiter': 10000})
+        tTo = op.minimize(J_a3, tT, args=(us, vs, t, i, c1, c2, cs,Acomb,space_corr), jac=True, constraints=[cons3, cons2, cons], method='SLSQP', options={'maxiter': 10000})
         print(tTo.message)
 
         # Update mapping
@@ -69,9 +63,6 @@ def registration_a3(u,v,t,I,c1,c2,c3,Acomb,space_corr,folder_results,ks):
         # Save mapping for future use
         np.savetxt(folder_results + '/mtT_i{}_ks{}.csv'.format(i,ks), tT, delimiter=',')
 
-        # print elapsed time
-        elapsed_time = time.time() - start_time
-        print('Elapsed time: {}'.format(elapsed_time))
 
     # Return mapping
     return tT

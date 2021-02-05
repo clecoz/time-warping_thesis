@@ -7,9 +7,11 @@ import pyproj
 from scipy.spatial.distance import pdist, squareform
 from itertools import combinations
 from scipy.sparse import csr_matrix
-
+import os
+import pandas as pd
 from pykrige import OrdinaryKriging
 import math
+import matplotlib.pyplot as plt
 import matplotlib.colors as cls
 from matplotlib.colors import ListedColormap
 
@@ -43,7 +45,7 @@ reg = "a1"          # Possible choice: "a1", "a2" and "a3"
 # Choose regulation coefficients
 c1 = 0.1
 c2 = 1
-c3 = 1
+cs = 1
 
 # Choose number of morphing grids
 I = 3
@@ -145,7 +147,7 @@ if reg == "a1":
 elif reg == "a2":
     Tt = registration_a2(u,v,t_resample,I,c1,c2,folder_result,ks)
 elif reg == "a3":
-    Tt = registration_a3(u,v,t_resample,I,c1,c2,c3,Acomb,space_corr,folder_result,ks)
+    Tt = registration_a3(u,v,t_resample,I,c1,c2,cs,Acomb,space_corr,folder_result,ks)
 else:
     print("Error (wrong ""reg""): this approach does not exist.")
 

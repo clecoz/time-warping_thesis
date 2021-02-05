@@ -1,3 +1,7 @@
+# Modified version of the interpolation package
+# The linear interpolation is returning the weights on top of the interpolated field.
+
+
 from __future__ import division, print_function, absolute_import
 
 __all__ = ['interp1d', 'interp2d', 'lagrange', 'PPoly', 'BPoly', 'NdPPoly',
