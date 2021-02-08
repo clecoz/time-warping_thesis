@@ -4,10 +4,15 @@ from interpolation2 import interpn_linear
 from scipy.sparse import csr_matrix, diags, issparse
 
 ########################################################################################################################
+#
+# Cost function and related functions
+#
+########################################################################################################################
+
 def smooth(v,t,i):
-    # This function return the smoothed signal
+    # This function returns the smoothed signal
     # It takes as inputs:
-    # - the input signal v (time series)
+    # - the input signal v (time series) to be smoothed
     # - the corresponding time coordinate t
     # - the step number i which defines the level of smoothing
 
@@ -26,8 +31,10 @@ def smooth(v,t,i):
     return v1
 
 
+#-----------------------------------------------------------------------------------
+# Warping functions
 def mapped(u,t,tT,i):
-    # This function return the warped signal
+    # This function returns the warped signal
     # It takes as inputs:
     # - the input signal u (time series)
     # - the corresponding time coordinate t
@@ -62,7 +69,7 @@ def mapped(u,t,tT,i):
 
 
 def mapped_weight(u, t, tT, i):
-    # This function return the warped signal and the corresponding interolation weight
+    # This function returns the warped signal and the corresponding interpolation weight (used in the computation of the derivative of the cost function).
     # It takes as inputs:
     # - the input signal u (time series)
     # - the corresponding time coordinate t
@@ -82,6 +89,9 @@ def mapped_weight(u, t, tT, i):
 
     return uT, uT_t
 
+
+#-----------------------------------------------------------------------------------
+# Derative function (used in cost_function)
 
 def dXdT(t,i):
     nt = len(t)
@@ -105,8 +115,9 @@ def dXdT(t,i):
     return dtdT2
 
 
+#-----------------------------------------------------------------------------------
+# Constraint functions
 
-#=============================
 def constr1(tTr,t,i,ns):
     # Check if first constraint is respected
     mi = 2 ** i + 1
@@ -164,7 +175,7 @@ def constr3_bis(tTi,t,i,ns):
 
 
 
-#=============================
+#-----------------------------------------------------------------------------------
 # Cost functions
 
 def J_a3(tTr,us,vs,t,i,c1,c2,cs,Acomb=None,space_corr=None):
@@ -175,7 +186,7 @@ def J_a3(tTr,us,vs,t,i,c1,c2,cs,Acomb=None,space_corr=None):
     # - the time coordinates t.
     # - the step i (defining the smoothing and the resolution of the mapping)
     # - the regulation coefficients c1, c2 and cs
-    # For approach A3: Acomb is a matrix pariring two by two the stations and space_corr the corresponding correlation. Together, they define the influence function.
+    # For approach A3: Acomb is a matrix pairing two by two the stations and space_corr the corresponding correlation. Together, they define the influence function.
 
     mi = 2**i + 1
     ns = us.shape[1]
@@ -240,7 +251,7 @@ def J_a3(tTr,us,vs,t,i,c1,c2,cs,Acomb=None,space_corr=None):
 
     if (Acomb is not None) and (cs!=0):
         if (Tdif_sc.T @ Tdif_sc)==0 or cs==0:
-            jac3 = 0
+            ja  = 0
         else:
             jac3 = cs * (mi ) ** (-1 / 2) * (Tdif_sc.T @ Tdif_sc) ** (-1 / 2) *  Acomb.T @ C.T  @ C @ Tdif_s
     else:

@@ -4,7 +4,7 @@ from morphing_function import *
 #===========================================================================
 
 def registration_a1(u,v,t,I,c1,c2,folder_results,ks):
-    # This function perform the automatic registration for the time warping and return the mappings.
+    # This function performs the automatic registration for the time warping and return the mappings.
     # It takes as input:
     # - u, the rainfall time series to be corrected.
     # - v, the target rainfall time series (assumed to be the truth). The inputs u and v need to have the same dimensions.
