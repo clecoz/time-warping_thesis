@@ -30,4 +30,4 @@ There are three main scripts:
  
  - "southern_ghana_case_LOOV.py" permits to reproduce the LOOV experiment for the southern Ghana case. One can modify the approach and the parameters of the registration.
  
- These scripts can be applied to ohter cases, given that the input data have the same format as the one here.
+ These scripts can be applied to ohter cases, given that the input data have the same format as the one provided in the "case" folders.
