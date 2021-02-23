@@ -251,7 +251,7 @@ def J_a3(tTr,us,vs,t,i,c1,c2,cs,Acomb=None,space_corr=None):
 
     if (Acomb is not None) and (cs!=0):
         if (Tdif_sc.T @ Tdif_sc)==0 or cs==0:
-            ja  = 0
+            jac3  = 0
         else:
             jac3 = cs * (mi ) ** (-1 / 2) * (Tdif_sc.T @ Tdif_sc) ** (-1 / 2) *  Acomb.T @ C.T  @ C @ Tdif_s
     else:

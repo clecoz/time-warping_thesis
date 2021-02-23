@@ -2,24 +2,17 @@ from registration_approach2 import *
 from registration_approach1 import *
 from registration_approach3 import *
 
-import time
 import pyproj
-import time
-import pyproj
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import pdist
 from itertools import combinations
-from scipy.sparse import csr_matrix
 import os
 import pandas as pd
 from pykrige import OrdinaryKriging
-import math
 import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap, cm
-import matplotlib.colors as cls
-from matplotlib.colors import ListedColormap
+from mpl_toolkits.basemap import Basemap
 
 #=======================================================================================================================
-# Synthetic case
+# Southern Ghana case ("LOOV" experiment)
 #=======================================================================================================================
 
 # Choose case
@@ -41,7 +34,7 @@ threshold = 0.1   # in mm/h, used to compute the position and timing error
 # Choose registration parameter
 
 # Choose registration approach
-reg = "a1"          # Possible choice: "a1", "a2" and "a3"
+reg = "a3"          # Possible choice: "a1", "a2" and "a3"
 
 # Choose regulation coefficients
 c1 = 0.1
@@ -159,7 +152,6 @@ for ks in range(ns):
         Acomb[nit,k] = -1
         Acomb[nit, j] = 1
         nit += 1
-    Acomb = csr_matrix(Acomb)
 
 
     # ---------------------------------------------
@@ -200,9 +192,9 @@ for ks in range(ns):
     yts *= (1 / 1000)
 
     if reg == "a2":
-        Tt_station[:, ks] = Tt.T.reshape(-1)
+        Tt_station = Tt_loov
         for kpt in range(npts):
-            Tt_grid[:, ks, kpt] = Tt.T.reshape(-1)
+            Tt_grid[:, :, kpt] = Tt_loov
 
     elif reg == "a1" or reg == "a3":
         # Interpolate at the missing station

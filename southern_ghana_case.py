@@ -4,9 +4,8 @@ from registration_approach3 import *
 
 import time
 import pyproj
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import pdist
 from itertools import combinations
-from scipy.sparse import csr_matrix
 import os
 import pandas as pd
 from pykrige import OrdinaryKriging
@@ -16,7 +15,7 @@ import matplotlib.colors as cls
 from matplotlib.colors import ListedColormap
 
 #=======================================================================================================================
-# Synthetic case
+# Southern Ghana case ("All" experiment)
 #=======================================================================================================================
 
 # Choose case
@@ -35,7 +34,7 @@ threshold = 0.1   # in mm/h, used to compute the position and timing error
 
 
 #==================================================================
-# Choose registration parameter
+# Choose registration parameters
 
 # Choose registration approach
 reg = "a3"          # Possible choice: "a1", "a2" and "a3"
@@ -130,7 +129,6 @@ for k, j in combinations(range(ns), 2):
     Acomb[nit,k] = -1
     Acomb[nit, j] = 1
     nit += 1
-Acomb = csr_matrix(Acomb)
 
 
 #================================================================

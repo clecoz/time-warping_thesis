@@ -4,7 +4,7 @@ from registration_approach3 import *
 
 import time
 import pyproj
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import pdist
 from itertools import combinations
 from scipy.sparse import csr_matrix
 import os
@@ -22,8 +22,6 @@ from matplotlib.colors import ListedColormap
 # Choose case
 case = 'case_spacetime'
 
-# Choose experience
-exp = "full"    #"full" or "interpolated"
 
 # Choose where to save results
 folder_result = "{}/results/".format(case).replace('.','p')
@@ -33,14 +31,14 @@ if not os.path.exists(folder_result):
 # Choose if you want to plot or compute statistics
 plot = True
 stats = True
-threshold = 20   # in mm/h, used to compute the position and timing error
+threshold = 1   # in mm/h, used to compute the position and timing error
 
 
 #==================================================================
-# Choose registration parameter
+# Choose registration parameters
 
 # Choose registration approach
-reg = "a1"          # Possible choice: "a1", "a2" and "a3"
+reg = "a3"          # Possible choice: "a1", "a2" and "a3"
 
 # Choose regulation coefficients
 c1 = 0.1
@@ -225,7 +223,7 @@ if stats:
     tuw = np.argmax(u_warped, axis=0)
 
     # Compute avrage timing difference
-    mask = (~(v_dom_resample < threshold).all(axis=0) * ~(u_dom_resample < 1).all(axis=0))
+    mask = (~(v_dom_resample < threshold).all(axis=0) * ~(u_dom_resample < 0.1).all(axis=0))
     timing_before = np.mean(np.abs(tu[mask] - tv[mask])) / 10
     timing_after = np.mean(np.abs(tuw[mask] - tv[mask])) / 10
 
@@ -263,7 +261,7 @@ if stats:
         dist_after[kt] = distance((y[juw[kt]], x[iuw[kt]]), (y[jv[kt]], x[iv[kt]]))
 
     # Compute average position error
-    mask = (~(v_dom_resample < threshold).all(axis=(1, 2)) * ~(u_dom_resample < 1).all(axis=(1, 2)))
+    mask = (~(v_dom_resample < threshold).all(axis=(1, 2)) * ~(u_dom_resample < 0.1).all(axis=(1, 2)))
     average_dist_before = np.mean(dist_before[mask])
     average_dist_after = np.mean(dist_after[mask])
 
